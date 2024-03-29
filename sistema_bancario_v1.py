@@ -1,42 +1,71 @@
-# O sistema deve permitir três saques diários com o valor máximo de R$500.00.
-# Não se deve permitir saques de valores que o cliente não tem.
-# O Sistema deve emitir uma mensagem de falta de saldo caso o usuário tente acessar a funcionalidade sem dinheiro.
-# Todos os saques devem ser exibidos em uma variável de extrato
-
-#Operação extrato deve constar todos os depósitos e saques
-#no fim da listagem deve exibir o saldo atual da conta
-
-import time
-
 total_na_conta = 0
-valor_deposito = 0
+saques_realizados = 0
+SAQUES_POR_DIA = 3
+historico = []
 
 def deposito():
+    global historico
+    global total_na_conta
     valor_deposito = float(input("Quanto você está depositando?\n"))
-    print("Um momento. Contando as cédulas...\n")
-    time.sleep(5)
-    print(f"Você depositou {valor_deposito:.2f}")
-    total_na_conta = valor_deposito + total_na_conta
+
+    if valor_deposito > 0:
+        print("Depósito realizado com sucesso!\n")
+    else:
+      print("Valor inválido!\n")
+      valor_deposito = float(input("Quanto você está depositando?\n"))
+    historico.append("Depósito +R$" + format(valor_deposito, ".2f"))
+    total_na_conta += valor_deposito
+    print(f"Você depositou R${valor_deposito:.2f}")
 
     return total_na_conta
-print(total_na_conta)
 
+def saque():
+  global historico
+  global SAQUES_POR_DIA
+  global total_na_conta
+  global saques_realizados 
+  saque = float(input("Digite quanto deseja sacar: "))
+  
+  if saque > total_na_conta or saque > 500.00:
+    print("Operação não pode ser realizada: Verifique seu saldo e/ou limite por saque.")
+  elif saque <= 0:
+    print("Valor inválido!")
+    saque = float(input("Digite quanto deseja sacar: "))
+  elif saques_realizados >= SAQUES_POR_DIA:
+     print("Limite de saques diários atingido!")
+  else:
+    print(f"Você acaba de sacar R${saque:.2f}")
+    total_na_conta -= saque
+    historico.append("Saque -R$" + format(saque, ".2f"))
+    saques_realizados += 1
+  
+  return total_na_conta, saques_realizados
+
+def extrato():
+  print("=======EXTRATO======")
+  for i in range(len(historico)):
+      print("--------------------")
+      print(historico[i])
+  print("--------------------")
+  print(f"Saldo: R${total_na_conta:.2f}")
+  print("====================")
+    
+  
 while True:
     escolha = input("Digite [d] parara DEPÓSITO\nDigite [s] para SAQUE\nDigite [e] para EXTRATO\nDigite [0] para SAIR\n")
 
     if escolha == 'd':
         print("Depósito: ")
-        time.sleep(3)
         deposito()
 
     elif escolha == 's':
         print("Saque: ")
+        saque()
+      
     elif escolha == 'e':
         print("Extrato: ")
+        extrato()
     elif escolha == 0:
         break
     else:
         print("Opção inválida. Por favor insira uma opção correta")
-
-
-
